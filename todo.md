@@ -8,3 +8,4 @@
 - config management
 - dockerization
 - manual
+- caching

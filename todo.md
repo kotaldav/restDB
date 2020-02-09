@@ -1,0 +1,10 @@
+- DB authentication
+- get requests
+  - selection - table, column value
+  - joining tables
+- post requests
+- adapter for different databases
+- db secrets management
+- config management
+- dockerization
+- manual

@@ -43,10 +43,7 @@ func main() {
 
   r := mux.NewRouter()
   api := r.PathPrefix("/api/v1").Subrouter()
-  api.HandleFunc("", get).Methods(http.MethodGet)
-  api.HandleFunc("", notFound)
-
+  api.HandleFunc("/", homeLink).Methods(http.MethodGet)
   api.HandleFunc("/{database}/{table}", getTableData).Methods(http.MethodGet)
-
   log.Fatal(http.ListenAndServe(":8080", r))
 }

@@ -1,0 +1,5 @@
+database:
+  dbhost: 127.0.0.1
+  database: testdb
+  dbuser: testuser
+  dbpass: testpass

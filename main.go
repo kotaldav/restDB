@@ -7,11 +7,14 @@ import (
 
   _ "github.com/go-sql-driver/mysql"
   "github.com/gorilla/mux"
+  "github.com/spf13/viper"
 )
 
 var (
 
 )
+
+
 
 func dbInit() *sql.DB {
 
@@ -39,7 +42,27 @@ func getTableData(w http.ResponseWriter, r *http.Request) {
 
 }
 
+func readConfg() (){
+
+  // Load configuration file
+  viper.Setconfigname("config.yml")
+  viper.AddConfigPath(".")
+  viper.AutomaticEnv()
+  viper.SetConfigType("yml")
+
+  // TODO: missing configuration
+  var dbConfig DbConfiguration
+  err := viper.Unmarshal(&dbConfig)
+  if err != nil {
+    // TODO: Error handling
+  }
+
+
+}
+
 func main() {
+
+
 
   r := mux.NewRouter()
   api := r.PathPrefix("/api/v1").Subrouter()

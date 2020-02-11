@@ -9,13 +9,14 @@ RUN go mod download
 
 COPY . .
 
-RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 GO111MODULE=on go build -o restdb main.go
+RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 GO111MODULE=on go build -o restdb
 
 FROM gcr.io/distroless/static:nonroot
 
 WORKDIR /
 
 COPY --from=builder /workspace/restdb .
+COPY config.yml /config.yml
 
 USER nonroot:nonroot
 

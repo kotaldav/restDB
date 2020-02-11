@@ -68,10 +68,13 @@ func readConfig(filename string) Configuration{
 
 func main() {
 
+  log.Print("Loading config")
   cfg := readConfig("config.yml")
 
+  log.Print("Establishing db connection")
   dbInit(cfg)
 
+  log.Print("Starting server")
   r := mux.NewRouter()
   api := r.PathPrefix("/api/v1").Subrouter()
   api.HandleFunc("/", homeLink).Methods(http.MethodGet)

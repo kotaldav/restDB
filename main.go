@@ -46,7 +46,7 @@ func getTableData(w http.ResponseWriter, r *http.Request) {
 
 }
 
-func readConfig(filename string) (Configuration){
+func readConfig(filename string) Configuration{
 
   // Load configuration file
   f, err := os.Open(filename)

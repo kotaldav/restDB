@@ -4,10 +4,12 @@ import (
   "net/http"
   "log"
   "database/sql"
+  "gopkg.in/yaml.v2"
+  "os"
+  "fmt"
 
   _ "github.com/go-sql-driver/mysql"
   "github.com/gorilla/mux"
-  "github.com/spf13/viper"
 )
 
 var (
@@ -16,9 +18,11 @@ var (
 
 
 
-func dbInit() *sql.DB {
+func dbInit(cfg Configuration) (*sql.DB) {
 
-  db, err := sql.Open("mysql", "")
+  connString := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s", cfg.Database.User, cfg.Database.Pass, cfg.Database.Host, cfg.Database.Port, cfg.Database.Database)
+
+  db, err := sql.Open("mysql", connString)
   if err != nil {
     log.Fatal(err)
   }
@@ -42,27 +46,31 @@ func getTableData(w http.ResponseWriter, r *http.Request) {
 
 }
 
-func readConfg() (){
+func readConfig(filename string) (Configuration){
 
   // Load configuration file
-  viper.Setconfigname("config.yml")
-  viper.AddConfigPath(".")
-  viper.AutomaticEnv()
-  viper.SetConfigType("yml")
-
-  // TODO: missing configuration
-  var dbConfig DbConfiguration
-  err := viper.Unmarshal(&dbConfig)
+  f, err := os.Open(filename)
   if err != nil {
-    // TODO: Error handling
+    log.Fatal(err)
   }
 
+  defer f.Close()
 
+  var cfg Configuration
+  decoder := yaml.NewDecoder(f)
+  err = decoder.Decode(&cfg)
+  if err != nil {
+    log.Fatal(err)
+  }
+
+  return cfg
 }
 
 func main() {
 
+  cfg := readConfig("config.yml")
 
+  dbInit(cfg)
 
   r := mux.NewRouter()
   api := r.PathPrefix("/api/v1").Subrouter()

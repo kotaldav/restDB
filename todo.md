@@ -11,3 +11,4 @@
 - dockerization
 - manual
 - caching
+- logging

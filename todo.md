@@ -1,10 +1,12 @@
-- DB authentication
+- DB authentication (config management)
+  - easy solution - file config / env vars
+  - research further
 - get requests
   - selection - table, column value
   - joining tables
 - post requests
+- user access security
 - adapter for different databases
-- db secrets management
 - config management
 - dockerization
 - manual

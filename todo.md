@@ -1,3 +1,8 @@
+- logging
+  - std lib: log
+  - logrus - structured JSON logging
+- DB struct with context - see websites
+
 - DB authentication (config management)
   - easy solution - file config / env vars
   - research further
@@ -11,4 +16,3 @@
 - dockerization
 - manual
 - caching
-- logging

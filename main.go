@@ -95,6 +95,9 @@ func readConfig(filename string) Configuration{
     log.Fatal(err)
   }
 
+  cfg.Database.User = os.Getenv("DB_USER")
+  cfg.Database.Pass = os.Getenv("DB_PASS")
+
   return cfg
 }
 

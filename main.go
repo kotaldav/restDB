@@ -7,6 +7,7 @@ import (
   "gopkg.in/yaml.v2"
   "os"
   "fmt"
+  "encoding/json"
 
   _ "github.com/go-sql-driver/mysql"
   "github.com/gorilla/mux"
@@ -74,6 +75,7 @@ func getTableData(w http.ResponseWriter, r *http.Request) {
     dataMap = append(dataMap, rowMap)
   }
 
+  json.NewEncoder(w).Encode(dataMap)
 }
 
 func readConfig(filename string) Configuration{

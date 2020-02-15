@@ -2,7 +2,6 @@ package main
 
 import (
   "net/http"
-  "log"
   "database/sql"
   "gopkg.in/yaml.v2"
   "os"
@@ -11,6 +10,7 @@ import (
 
   _ "github.com/go-sql-driver/mysql"
   "github.com/gorilla/mux"
+  log "github.com/sirupsen/logrus"
 )
 
 var (
@@ -103,6 +103,17 @@ func readConfig(filename string) Configuration{
 
 func main() {
 
+  log.SetFormatter(&log.JSONFormatter{})
+  standardFields := log.Fields{
+    "hostname": "test",
+    "appname": "restDB",
+    "session": "testNum",
+  }
+  log.SetOutput(os.Stdout)
+  log.SetLevel(log.InfoLevel)
+
+
+
   log.Print("Loading config")
   cfg := readConfig("config.yml")
 
@@ -114,5 +125,5 @@ func main() {
   api := r.PathPrefix("/api/v1").Subrouter()
   api.HandleFunc("/", homeLink).Methods(http.MethodGet)
   api.HandleFunc("/{database}/{table}", getTableData).Methods(http.MethodGet)
-  log.Fatal(http.ListenAndServe(":8080", r))
+  log.WithFields(standardFields).Info(http.ListenAndServe(":8080", r))
 }

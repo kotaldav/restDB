@@ -7,6 +7,7 @@ import (
   "os"
   "fmt"
   "encoding/json"
+  "time"
 
   _ "github.com/go-sql-driver/mysql"
   "github.com/gorilla/mux"
@@ -28,6 +29,14 @@ func dbInit(cfg Configuration) {
   if err != nil {
     log.Fatal(err)
   }
+}
+
+// Logging wrapper
+func logger(h http.Handler) http.Handler {
+  return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+    log.WithFields(log.Fields{"time": time.Since(time.Now()), "Method": r.Method, "Uri": r.RequestURI,}).Info()
+    h.ServeHTTP(w, r)
+  })
 }
 
 func homeLink(w http.ResponseWriter, r *http.Request) {
@@ -101,7 +110,16 @@ func readConfig(filename string) Configuration{
   return cfg
 }
 
+
 func main() {
+
+  /*
+  srv := &http.Server{
+    Addr:         ":8080",
+    ReadTimeout:  10 * time.Second,
+    WriteTimeout: 10 * time.Second,
+  }
+  */
 
   log.SetFormatter(&log.JSONFormatter{})
   standardFields := log.Fields{
@@ -123,7 +141,7 @@ func main() {
   log.Print("Starting server")
   r := mux.NewRouter()
   api := r.PathPrefix("/api/v1").Subrouter()
-  api.HandleFunc("/", homeLink).Methods(http.MethodGet)
-  api.HandleFunc("/{database}/{table}", getTableData).Methods(http.MethodGet)
+  api.Handle("/", logger(http.HandlerFunc(homeLink))).Methods(http.MethodGet)
+  api.Handle("/{database}/{table}", logger(http.HandlerFunc(getTableData))).Methods(http.MethodGet)
   log.WithFields(standardFields).Info(http.ListenAndServe(":8080", r))
 }

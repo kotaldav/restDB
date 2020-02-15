@@ -1,6 +1,7 @@
 - logging
   - std lib: log
   - logrus - structured JSON logging
+  - currently loggin via logger wrapper. Research attaching logger to handle/server config.
 - DB struct with context - see websites
 
 - DB authentication (config management)

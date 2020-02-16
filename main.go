@@ -57,16 +57,25 @@ func notFound(w http.ResponseWriter, r *http.Request) {
   w.Write([]byte(`{"message": "not found"}`))
 }
 
+
+func getDblist(w http.ResponseWriter, r *http.Request) {
+
+}
+
+func getDbTables(w http.ResponseWriter, r *http.Request) {
+
+}
+
 func getTableData(w http.ResponseWriter, r *http.Request) {
 
   log.Info("get start")
   vars := mux.Vars(r)
-  //dbName := vars["database"]
+  dbName := vars["database"]
   dbTable := vars["table"]
 
   log.Info(dbTable)
 
-  rows, err := db.Query("Select * from " + dbTable)
+  rows, err := db.Query("Select * from " + dbName + "." + dbTable)
   if err != nil {
     panic(err.Error())
   }
@@ -123,6 +132,21 @@ func readConfig(filename string) Configuration{
   return cfg
 }
 
+func insTableData(w http.ResponseWriter, r *http.Request) {
+
+}
+
+func putTableData(w http.ResponseWriter, r *http.Request) {
+
+}
+
+func ptcTableData(w http.ResponseWriter, r *http.Request) {
+
+}
+
+func delTableData(w http.ResponseWriter, r *http.Request) {
+
+}
 
 func main() {
 
@@ -155,6 +179,12 @@ func main() {
   r := mux.NewRouter()
   api := r.PathPrefix("/api/v1").Subrouter()
   api.Handle("/", logger(http.HandlerFunc(homeLink))).Methods(http.MethodGet)
+  api.Handle("/databases",          logger(http.HandlerFunc(getDblist))).Methods(http.MethodGet)
+  api.Handle("/{database}/tables",  logger(http.HandlerFunc(getDbTables))).Methods(http.MethodGet)
   api.Handle("/{database}/{table}", logger(http.HandlerFunc(getTableData))).Methods(http.MethodGet)
+  api.Handle("/{database}/{table}", logger(http.HandlerFunc(insTableData))).Methods(http.MethodPost)
+  api.Handle("/{database}/{table}", logger(http.HandlerFunc(putTableData))).Methods(http.MethodPut)
+  api.Handle("/{database}/{table}", logger(http.HandlerFunc(ptcTableData))).Methods(http.MethodPatch)
+  api.Handle("/{database}/{table}", logger(http.HandlerFunc(delTableData))).Methods(http.MethodDelete)
   log.WithFields(standardFields).Info(http.ListenAndServe(":8080", r))
 }

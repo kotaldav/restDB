@@ -23,9 +23,15 @@ var (
 func dbInit(cfg Configuration) {
 
   connString := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s", cfg.Database.User, cfg.Database.Pass, cfg.Database.Host, cfg.Database.Port, cfg.Database.Database)
+  log.Info(connString)
 
   var err error
   db, err = sql.Open("mysql", connString)
+  if err != nil {
+    log.Fatal(err)
+  }
+
+  err = db.Ping()
   if err != nil {
     log.Fatal(err)
   }
@@ -53,18 +59,24 @@ func notFound(w http.ResponseWriter, r *http.Request) {
 
 func getTableData(w http.ResponseWriter, r *http.Request) {
 
+  log.Info("get start")
   vars := mux.Vars(r)
   //dbName := vars["database"]
   dbTable := vars["table"]
+
+  log.Info(dbTable)
 
   rows, err := db.Query("Select * from " + dbTable)
   if err != nil {
     panic(err.Error())
   }
   defer rows.Close()
+  log.Info("after query")
 
   columns, _ := rows.Columns()
   dataMap := make([]map[string]interface{}, 0)
+
+  log.Info("Processing query")
 
   for rows.Next() {
     colVals := make([]interface{}, len(columns))
@@ -106,6 +118,7 @@ func readConfig(filename string) Configuration{
 
   cfg.Database.User = os.Getenv("DB_USER")
   cfg.Database.Pass = os.Getenv("DB_PASS")
+  cfg.Database.Host = os.Getenv("DB_HOST")
 
   return cfg
 }

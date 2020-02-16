@@ -65,6 +65,7 @@ func rowsToMap( rows *sql.Rows ) ([]map[string]interface{}) {
     for i, colName := range columns {
       rowMap[colName] = *colPtrs[i].(*interface{})
     }
+    log.Info(rowMap)
     dataMap = append(dataMap, rowMap)
   }
   return dataMap
@@ -121,7 +122,6 @@ func getTableData(w http.ResponseWriter, r *http.Request) {
   defer rows.Close()
 
   dataMap := rowsToMap(rows)
-
   json.NewEncoder(w).Encode(dataMap)
 }
 

@@ -1,9 +1,9 @@
+- sql query to interface map - base64 strings - fix
 - logging
   - std lib: log
   - logrus - structured JSON logging
   - currently loggin via logger wrapper. Research attaching logger to handle/server config.
 - DB struct with context - see websites
-
 - DB authentication (config management)
   - easy solution - file config / env vars
   - research further

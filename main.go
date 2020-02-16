@@ -45,47 +45,10 @@ func logger(h http.Handler) http.Handler {
   })
 }
 
-func homeLink(w http.ResponseWriter, r *http.Request) {
-  w.Header().Set("Content-Type", "application/json")
-  w.WriteHeader(http.StatusOK)
-  w.Write([]byte(`{"message": "get called"}`))
-}
-
-func notFound(w http.ResponseWriter, r *http.Request) {
-  w.Header().Set("Content-Type", "application/json")
-  w.WriteHeader(http.StatusOK)
-  w.Write([]byte(`{"message": "not found"}`))
-}
-
-
-func getDblist(w http.ResponseWriter, r *http.Request) {
-
-}
-
-func getDbTables(w http.ResponseWriter, r *http.Request) {
-
-}
-
-func getTableData(w http.ResponseWriter, r *http.Request) {
-
-  log.Info("get start")
-  vars := mux.Vars(r)
-  dbName := vars["database"]
-  dbTable := vars["table"]
-
-  log.Info(dbTable)
-
-  rows, err := db.Query("Select * from " + dbName + "." + dbTable)
-  if err != nil {
-    panic(err.Error())
-  }
-  defer rows.Close()
-  log.Info("after query")
+func rowsToMap( rows *sql.Rows ) ([]map[string]interface{}) {
 
   columns, _ := rows.Columns()
   dataMap := make([]map[string]interface{}, 0)
-
-  log.Info("Processing query")
 
   for rows.Next() {
     colVals := make([]interface{}, len(columns))
@@ -104,6 +67,60 @@ func getTableData(w http.ResponseWriter, r *http.Request) {
     }
     dataMap = append(dataMap, rowMap)
   }
+  return dataMap
+}
+
+func homeLink(w http.ResponseWriter, r *http.Request) {
+  w.Header().Set("Content-Type", "application/json")
+  w.WriteHeader(http.StatusOK)
+  w.Write([]byte(`{"message": "get called"}`))
+}
+
+func notFound(w http.ResponseWriter, r *http.Request) {
+  w.Header().Set("Content-Type", "application/json")
+  w.WriteHeader(http.StatusOK)
+  w.Write([]byte(`{"message": "not found"}`))
+}
+
+
+func getDblist(w http.ResponseWriter, r *http.Request) {
+  rows , err := db.Query("SHOW DATABASES")
+  if err != nil {
+    log.Fatal(err)
+  }
+
+  dataMap := rowsToMap(rows)
+  json.NewEncoder(w).Encode(dataMap)
+}
+
+func getDbTables(w http.ResponseWriter, r *http.Request) {
+  vars := mux.Vars(r)
+  dbName := vars["database"]
+
+  rows, err := db.Query("SHOW TABLES IN " + dbName)
+  if err != nil {
+    log.Fatal(err)
+  }
+
+  dataMap := rowsToMap(rows)
+  json.NewEncoder(w).Encode(dataMap)
+}
+
+func getTableData(w http.ResponseWriter, r *http.Request) {
+
+  vars := mux.Vars(r)
+  dbName := vars["database"]
+  dbTable := vars["table"]
+
+  log.Info(dbTable)
+
+  rows, err := db.Query("SELECT * FROM " + dbName + "." + dbTable)
+  if err != nil {
+    panic(err.Error())
+  }
+  defer rows.Close()
+
+  dataMap := rowsToMap(rows)
 
   json.NewEncoder(w).Encode(dataMap)
 }

@@ -64,6 +64,9 @@ func rowsToMap( rows *sql.Rows ) ([]map[string]interface{}) {
     rowMap := make(map[string]interface{})
     for i, colName := range columns {
       rowMap[colName] = *colPtrs[i].(*interface{})
+      if b, ok := rowMap[colName].([]byte); ok {
+          rowMap[colName] = string(b)
+      }
     }
     log.Info(rowMap)
     dataMap = append(dataMap, rowMap)

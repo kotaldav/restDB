@@ -45,6 +45,30 @@ func logger(h http.Handler) http.Handler {
   })
 }
 
+func readConfig(filename string) Configuration{
+
+  // Load configuration file
+  f, err := os.Open(filename)
+  if err != nil {
+    log.Fatal(err)
+  }
+
+  defer f.Close()
+
+  var cfg Configuration
+  decoder := yaml.NewDecoder(f)
+  err = decoder.Decode(&cfg)
+  if err != nil {
+    log.Fatal(err)
+  }
+
+  cfg.Database.User = os.Getenv("DB_USER")
+  cfg.Database.Pass = os.Getenv("DB_PASS")
+  cfg.Database.Host = os.Getenv("DB_HOST")
+
+  return cfg
+}
+
 func rowsToMap( rows *sql.Rows ) ([]map[string]interface{}) {
 
   columns, _ := rows.Columns()
@@ -128,32 +152,29 @@ func getTableData(w http.ResponseWriter, r *http.Request) {
   json.NewEncoder(w).Encode(dataMap)
 }
 
-func readConfig(filename string) Configuration{
-
-  // Load configuration file
-  f, err := os.Open(filename)
-  if err != nil {
-    log.Fatal(err)
-  }
-
-  defer f.Close()
-
-  var cfg Configuration
-  decoder := yaml.NewDecoder(f)
-  err = decoder.Decode(&cfg)
-  if err != nil {
-    log.Fatal(err)
-  }
-
-  cfg.Database.User = os.Getenv("DB_USER")
-  cfg.Database.Pass = os.Getenv("DB_PASS")
-  cfg.Database.Host = os.Getenv("DB_HOST")
-
-  return cfg
-}
-
 func insTableData(w http.ResponseWriter, r *http.Request) {
 
+  vars := mux.Vars(r)
+  dbName  := vars["database"]
+  dbTable := vars["table"]
+
+  body := make(map[string]interface{})
+  err := json.NewDecoder(r.Body).Decode(&body)
+  if err != nil {
+    http.Error(w, err.Error(), http.StatusBadRequest)
+    return
+  }
+
+  log.info(body)
+
+  var columns = {}
+  var values = {}
+  for k, v := range body {
+    columns = append(columns, k)
+    values = append(values, v)
+  }
+  query := "INSERT INTO " + dbName + "." + dbTable + "(" + strings.Join(columns[:], ",") + ") VALUES (" + strings.Join(vals[:], ",") + ")"
+  err = db.Query(query)
 }
 
 func putTableData(w http.ResponseWriter, r *http.Request) {

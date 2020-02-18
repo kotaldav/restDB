@@ -9,6 +9,7 @@ import (
   "encoding/json"
   "time"
   "strings"
+  "reflect"
 
   _ "github.com/go-sql-driver/mysql"
   "github.com/gorilla/mux"
@@ -72,30 +73,38 @@ func readConfig(filename string) Configuration{
 
 func rowsToMap( rows *sql.Rows ) ([]map[string]interface{}) {
 
+  cols, _ := rows.ColumnTypes()
+  types := make([]reflect.Type, len(cols))
+  for i, col := range cols {
+    typ := col.ScanType()
+    switch typ {
+    case reflect.TypeOf(sql.RawBytes{}):
+      types[i] = reflect.TypeOf("")       //!!!!!!! Ugliest freaking hack on earth, Fix
+    default:
+      types[i] = typ
+    }
+  }
+
   columns, _ := rows.Columns()
   dataMap := make([]map[string]interface{}, 0)
 
+  values := make([]interface{}, len(columns))
   for rows.Next() {
-    colVals := make([]interface{}, len(columns))
-    colPtrs  := make([]interface{}, len(columns))
-    for i, _ := range colVals{
-      colPtrs[i] = &colVals[i]
+    for i := range values {
+      values[i] = reflect.New(types[i]).Interface()
     }
-
-    if err := rows.Scan(colPtrs...); err != nil {
-      panic(err.Error())
+    err := rows.Scan(values...)
+    if err != nil {
+      log.Fatal(err)
     }
-
     rowMap := make(map[string]interface{})
     for i, colName := range columns {
-      rowMap[colName] = *colPtrs[i].(*interface{})
-      if b, ok := rowMap[colName].([]byte); ok {
-          rowMap[colName] = string(b)
-      }
+      rowMap[colName] = values[i]
     }
     log.Info(rowMap)
     dataMap = append(dataMap, rowMap)
   }
+
   return dataMap
 }
 

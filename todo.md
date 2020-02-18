@@ -1,4 +1,5 @@
-- sql query to interface map - base64 strings - fix
+- reflecting db types and hack string, but not finished
+  - NullString, NullInt etc needed to be implemented
 - logging
   - std lib: log
   - logrus - structured JSON logging

@@ -149,6 +149,8 @@ func getTableData(w http.ResponseWriter, r *http.Request) {
   }
   defer rows.Close()
 
+  w.Header().Set("Content-type","application/json")
+
   dataMap := rowsToMap(rows)
   json.NewEncoder(w).Encode(dataMap)
 }

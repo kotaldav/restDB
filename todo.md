@@ -1,4 +1,3 @@
-- Test insert
 - sql query to interface map - base64 strings - fix
 - logging
   - std lib: log

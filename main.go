@@ -8,6 +8,7 @@ import (
   "fmt"
   "encoding/json"
   "time"
+  "strings"
 
   _ "github.com/go-sql-driver/mysql"
   "github.com/gorilla/mux"
@@ -165,16 +166,18 @@ func insTableData(w http.ResponseWriter, r *http.Request) {
     return
   }
 
-  log.info(body)
+  log.Info(body)
 
-  var columns = {}
-  var values = {}
+  var columns []string
+  var values  []string
   for k, v := range body {
     columns = append(columns, k)
-    values = append(values, v)
+    values = append(values, v.(string))
   }
-  query := "INSERT INTO " + dbName + "." + dbTable + "(" + strings.Join(columns[:], ",") + ") VALUES (" + strings.Join(vals[:], ",") + ")"
-  err = db.Query(query)
+  query := "INSERT INTO " + dbName + "." + dbTable + " (" + strings.Join(columns[:], ",") + ") VALUES ('" + strings.Join(values[:], ",'") + "')"
+  log.Info(query)
+  result, err := db.Query(query)
+  log.Print(result)
 }
 
 func putTableData(w http.ResponseWriter, r *http.Request) {

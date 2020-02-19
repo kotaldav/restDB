@@ -71,8 +71,7 @@ func readConfig(filename string) Configuration{
   return cfg
 }
 
-func rowsToMap( rows *sql.Rows ) ([]map[string]interface{}) {
-
+func getSqlTypes( rows *sql.Rows) ([]reflect.Type) {
   cols, _ := rows.ColumnTypes()
   types := make([]reflect.Type, len(cols))
   for i, col := range cols {
@@ -84,8 +83,13 @@ func rowsToMap( rows *sql.Rows ) ([]map[string]interface{}) {
       types[i] = typ
     }
   }
+  return types
+}
+
+func rowsToMap( rows *sql.Rows ) ([]map[string]interface{}) {
 
   columns, _ := rows.Columns()
+  types := getSqlTypes(rows)
   dataMap := make([]map[string]interface{}, 0)
 
   values := make([]interface{}, len(columns))

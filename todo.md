@@ -1,3 +1,7 @@
+- processing params
+  - does parram types matter (single quotes on everything ok)?
+  - Prepare join map func with delimiter
+  - WHERE IN implementation?
 - reflecting db types and hack string, but not finished
   - NullString, NullInt etc needed to be implemented
 - logging

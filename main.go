@@ -2,6 +2,7 @@ package main
 
 import (
   "net/http"
+  "net/url"
   "database/sql"
   "gopkg.in/yaml.v2"
   "os"
@@ -148,13 +149,17 @@ func getDbTables(w http.ResponseWriter, r *http.Request) {
   json.NewEncoder(w).Encode(dataMap)
 }
 
+func processParams(quer url.URL) {
+
+}
+
 func getTableData(w http.ResponseWriter, r *http.Request) {
 
   vars := mux.Vars(r)
   dbName := vars["database"]
   dbTable := vars["table"]
 
-  log.Info(dbTable)
+  log.Info("url: ", r.URL.Query())
 
   rows, err := db.Query("SELECT * FROM " + dbName + "." + dbTable)
   if err != nil {

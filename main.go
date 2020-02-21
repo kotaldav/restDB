@@ -149,8 +149,17 @@ func getDbTables(w http.ResponseWriter, r *http.Request) {
   json.NewEncoder(w).Encode(dataMap)
 }
 
-func processParams(quer url.URL) {
+func processParams(reqUrl *url.URL) (string) {
+  params := reqUrl.Query()
+  var queryPar string = ""
+  for key, val := range params {
+    switch key {
+      case "id":
+        queryPar = fmt.Sprintf("WHERE %s=%s ", key, val[0])
+    }
+  }
 
+  return queryPar
 }
 
 func getTableData(w http.ResponseWriter, r *http.Request) {
@@ -159,9 +168,9 @@ func getTableData(w http.ResponseWriter, r *http.Request) {
   dbName := vars["database"]
   dbTable := vars["table"]
 
-  log.Info("url: ", r.URL.Query())
+  queryPar := processParams(r.URL)
 
-  rows, err := db.Query("SELECT * FROM " + dbName + "." + dbTable)
+  rows, err := db.Query("SELECT * FROM " + dbName + "." + dbTable + " " + queryPar)
   if err != nil {
     panic(err.Error())
   }

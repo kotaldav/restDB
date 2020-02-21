@@ -149,15 +149,39 @@ func getDbTables(w http.ResponseWriter, r *http.Request) {
   json.NewEncoder(w).Encode(dataMap)
 }
 
+func parseWhereMap(whereMap map[string]string) string {
+  var whereString string
+  if len(whereMap) == 0 {
+    return ""
+  } else {
+   whereString = "WHERE "
+   for key, val := range whereMap {
+    log.Info(reflect.TypeOf(val))
+    whereString += key + "='" + val + "'" + " AND " //ugly hack, fix
+   }
+   whereString = strings.TrimRight(whereString, " AND")
+  }
+  return whereString
+}
+
 func processParams(reqUrl *url.URL) (string) {
   params := reqUrl.Query()
+  log.Info(params)
   var queryPar string = ""
+  whereMap := make(map[string]string)
   for key, val := range params {
     switch key {
-      case "id":
-        queryPar = fmt.Sprintf("WHERE %s=%s ", key, val[0])
+      case "orderBy":
+        log.Info("TODO: ordering")
+      case "orderByDesc":
+        log.Info("TODO: desc ordering")
+      default:
+        whereMap[key] = val[0]
     }
   }
+
+  whereQuery := parseWhereMap(whereMap)
+  queryPar += whereQuery
 
   return queryPar
 }
@@ -169,8 +193,10 @@ func getTableData(w http.ResponseWriter, r *http.Request) {
   dbTable := vars["table"]
 
   queryPar := processParams(r.URL)
+  query    := "SELECT * FROM " + dbName + "." + dbTable + " " + queryPar
+  log.Info(query)
 
-  rows, err := db.Query("SELECT * FROM " + dbName + "." + dbTable + " " + queryPar)
+  rows, err := db.Query(query)
   if err != nil {
     panic(err.Error())
   }

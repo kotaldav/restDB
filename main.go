@@ -195,6 +195,11 @@ func processParams(reqUrl *url.URL) (string) {
   return queryPar
 }
 
+func bodyToQuery () {
+
+
+}
+
 func getTableData(w http.ResponseWriter, r *http.Request) {
 
   vars := mux.Vars(r)

@@ -175,16 +175,22 @@ func processParams(reqUrl *url.URL) (string) {
   for key, val := range params {
     switch key {
       case "orderBy":
-        log.Info("TODO: ordering")
+        queryPar += "ORDER BY " + val
       case "orderByDesc":
-        log.Info("TODO: desc ordering")
+        queryPar += "ORDER BY DESC " + val
       default:
         whereMap[key] = val[0]
     }
   }
 
+  if len(whereMap) == 0 {
+    return queryPar
+  } else {
+    whereQuery := "WHERE " + joinMapToString(whereMap, "=", " AND ")
+    queryPar = whereQuery + " " + queryPar
+  }
   whereQuery := "WHERE " + joinMapToString(whereMap, "=", " AND ")
-  queryPar += whereQuery
+  queryPar = whereQuery
 
   return queryPar
 }

@@ -87,6 +87,24 @@ func getSqlTypes( rows *sql.Rows) ([]reflect.Type) {
   return types
 }
 
+func joinMapToString (mp map[string]string, keyValDelimiter string, itemDelimiter string) (string) {
+
+	var mapString string = ""
+	itemIndex := 0
+	for key, val := range mp {
+		var appString string = ""
+		if itemIndex == 0 {
+			appString = key + keyValDelimiter + val
+		} else {
+			appString = itemDelimiter + key + keyValDelimiter + "'" + val + "'"
+		}
+		mapString += appString
+		itemIndex +=1
+	}
+
+	return mapString
+}
+
 func rowsToMap( rows *sql.Rows ) ([]map[string]interface{}) {
 
   columns, _ := rows.Columns()
@@ -149,21 +167,6 @@ func getDbTables(w http.ResponseWriter, r *http.Request) {
   json.NewEncoder(w).Encode(dataMap)
 }
 
-func parseWhereMap(whereMap map[string]string) string {
-  var whereString string
-  if len(whereMap) == 0 {
-    return ""
-  } else {
-   whereString = "WHERE "
-   for key, val := range whereMap {
-    log.Info(reflect.TypeOf(val))
-    whereString += key + "='" + val + "'" + " AND " //ugly hack, fix
-   }
-   whereString = strings.TrimRight(whereString, " AND")
-  }
-  return whereString
-}
-
 func processParams(reqUrl *url.URL) (string) {
   params := reqUrl.Query()
   log.Info(params)
@@ -180,7 +183,7 @@ func processParams(reqUrl *url.URL) (string) {
     }
   }
 
-  whereQuery := parseWhereMap(whereMap)
+  whereQuery := "WHERE " + joinMapToString(whereMap, "=", " AND ")
   queryPar += whereQuery
 
   return queryPar

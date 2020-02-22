@@ -254,6 +254,16 @@ func ptcTableData(w http.ResponseWriter, r *http.Request) {
 
 func delTableData(w http.ResponseWriter, r *http.Request) {
 
+  vars := mux.Vars(r)
+  dbName := vars["database"]
+  dbTable := vars["table"]
+
+  queryParMap := r.URL.Query()
+  queryString := joinMapToString(queryParMap, "=", "")
+  query       := "DELETE FROM " + dbName + "." + dbTable + " WHERE " + queryString
+
+  result, err := db.Query(query)
+  log.Print(result)
 }
 
 func main() {
@@ -274,8 +284,6 @@ func main() {
   }
   log.SetOutput(os.Stdout)
   log.SetLevel(log.InfoLevel)
-
-
 
   log.Print("Loading config")
   cfg := readConfig("config.yml")

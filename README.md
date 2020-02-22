@@ -16,4 +16,14 @@
 
 ## Insert data - POST request
 /api/v1/{database}/{table}    # Insert new row with json body content
+
+## Replace data - PUT request
+/api/v1/{database}{table}?{column}=value # Replace row with json body Content
+
+## Update row - PATCH request
+/api/v1/{database}{table}?{column}=value&{col1}={val1}&{col2}={val2}
+
+## delete row - DELETE request
+/api/v1/{database}{table}?{colum}={value}
+
 ```

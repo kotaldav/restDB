@@ -228,6 +228,8 @@ func insTableData(w http.ResponseWriter, r *http.Request) {
   dbName  := vars["database"]
   dbTable := vars["table"]
 
+  bodyMap := bodyToQuery(r.Body)
+
   body := make(map[string]interface{})
   err := json.NewDecoder(r.Body).Decode(&body)
   if err != nil {
@@ -255,6 +257,14 @@ func putTableData(w http.ResponseWriter, r *http.Request) {
 
 func ptcTableData(w http.ResponseWriter, r *http.Request) {
 
+  vars := mux.Vars(r)
+  dbName := vars["database"]
+  dbTable := vars["table"]
+
+  updateData := ""
+  rowCond := ""
+
+  query := fmt.Sprintf("UPDATE %s.%s SET %s WHERE %s", dbName, dbTable, updateData, rowCond)
 }
 
 func delTableData(w http.ResponseWriter, r *http.Request) {

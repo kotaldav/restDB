@@ -21,7 +21,7 @@
 /api/v1/{database}{table}?{column}=value # Replace row with json body Content
 
 ## Update row - PATCH request
-/api/v1/{database}{table}?{column}=value&{col1}={val1}&{col2}={val2}
+/api/v1/{database}{table}?{column}=value # Update fields on specified row from json body
 
 ## delete row - DELETE request
 /api/v1/{database}{table}?{colum}={value}

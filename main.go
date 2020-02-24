@@ -175,9 +175,9 @@ func processParams(reqUrl *url.URL) (string) {
   for key, val := range params {
     switch key {
       case "orderBy":
-        queryPar += "ORDER BY " + val
+        queryPar += "ORDER BY " + val[0]
       case "orderByDesc":
-        queryPar += "ORDER BY DESC " + val
+        queryPar += "ORDER BY " + val[0] + " DESC"
       default:
         whereMap[key] = val[0]
     }
@@ -228,8 +228,6 @@ func insTableData(w http.ResponseWriter, r *http.Request) {
   dbName  := vars["database"]
   dbTable := vars["table"]
 
-  bodyMap := bodyToQuery(r.Body)
-
   body := make(map[string]interface{})
   err := json.NewDecoder(r.Body).Decode(&body)
   if err != nil {
@@ -265,6 +263,8 @@ func ptcTableData(w http.ResponseWriter, r *http.Request) {
   rowCond := ""
 
   query := fmt.Sprintf("UPDATE %s.%s SET %s WHERE %s", dbName, dbTable, updateData, rowCond)
+
+  log.Info(query)
 }
 
 func delTableData(w http.ResponseWriter, r *http.Request) {
@@ -273,11 +273,13 @@ func delTableData(w http.ResponseWriter, r *http.Request) {
   dbName := vars["database"]
   dbTable := vars["table"]
 
-  queryParMap := r.URL.Query()
-  queryString := joinMapToString(queryParMap, "=", "")
+  queryString := processParams(r.URL)
   query       := "DELETE FROM " + dbName + "." + dbTable + " WHERE " + queryString
 
   result, err := db.Query(query)
+  if err != nil {
+    log.Fatal(err)
+  }
   log.Print(result)
 }
 

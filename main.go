@@ -195,9 +195,13 @@ func processParams(reqUrl *url.URL) (string) {
   return queryPar
 }
 
-func bodyToQuery () {
+func bodyToQuery ( body string) return map[string]interface{} {
 
+  bodyMap := make(map[string]interface{}
 
+  // TODO parse json body into map
+
+  return bodyMap
 }
 
 func getTableData(w http.ResponseWriter, r *http.Request) {
@@ -259,7 +263,7 @@ func ptcTableData(w http.ResponseWriter, r *http.Request) {
   dbName := vars["database"]
   dbTable := vars["table"]
 
-  updateData := ""
+  updateData := bodyToQuery(r.Body)
   rowCond := ""
 
   query := fmt.Sprintf("UPDATE %s.%s SET %s WHERE %s", dbName, dbTable, updateData, rowCond)

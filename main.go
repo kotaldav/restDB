@@ -21,8 +21,6 @@ var (
   db *sql.DB
 )
 
-
-
 func dbInit(cfg Configuration) {
 
   connString := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s", cfg.Database.User, cfg.Database.Pass, cfg.Database.Host, cfg.Database.Port, cfg.Database.Database)
@@ -195,11 +193,13 @@ func processParams(reqUrl *url.URL) (string) {
   return queryPar
 }
 
-func bodyToQuery ( body string) return map[string]interface{} {
+func bodyToQuery ( r *http.Request ) map[string]interface{} {
 
-  bodyMap := make(map[string]interface{}
-
-  // TODO parse json body into map
+  bodyMap := make(map[string]interface{})
+  err := json.NewDecoder(r.Body).Decode(&bodyMap)
+  if err != nil {
+    log.Fatal(err)
+  }
 
   return bodyMap
 }
@@ -263,7 +263,7 @@ func ptcTableData(w http.ResponseWriter, r *http.Request) {
   dbName := vars["database"]
   dbTable := vars["table"]
 
-  updateData := bodyToQuery(r.Body)
+  updateData := bodyToQuery(r)
   rowCond := ""
 
   query := fmt.Sprintf("UPDATE %s.%s SET %s WHERE %s", dbName, dbTable, updateData, rowCond)
